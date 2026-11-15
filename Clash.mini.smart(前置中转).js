@@ -1915,7 +1915,16 @@ function buildConfig(config) {
       Array.isArray(renamedGroup.proxies) && (renamedGroup.proxies = renamedGroup.proxies.map(name => {
         for (const [origName, emoji] of Object.entries(airportGroupEmojis)) if (name === origName) return emoji + " " + origName;
         return name;
-      })), proxyGroups.push(renamedGroup);
+      })),
+      // 过滤悬空引用：机场改版后组成员可能引用未保留的开关组（如「关闭」），
+      // 内核会报 'not found'。只保留真实节点（airportTransitNodeNames 或 allProxyNames）
+      // 与两个机场组的新名引用；全部被过滤为空时兜底 DIRECT。
+      Array.isArray(renamedGroup.proxies) && (renamedGroup.proxies = renamedGroup.proxies.filter(name => {
+        if (name === "DIRECT" || name === "REJECT") return true;
+        for (const [origName, emoji] of Object.entries(airportGroupEmojis)) if (name === emoji + " " + origName) return true;
+        return (airportTransitNodeNames.has(name) && seenProxyNames.has(name)) || allProxyNames.indexOf(name) >= 0;
+      }), renamedGroup.proxies.length || (renamedGroup.proxies = [ "DIRECT" ])),
+      proxyGroups.push(renamedGroup);
     }
   }
   const finalizedProxyGroups = function(groups) {

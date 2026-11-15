@@ -1895,16 +1895,19 @@ function buildConfig(config) {
   // 注入时加 emoji 前缀和图标，让机场组在 UI 中更醒目。
   // 同时更新组内 proxies 引用的组名（机场原始名称 → 新 emoji 名称），避免内核报 not found。
     const airportGroupEmojis = {
+
     "前置中转": "⚙️",
-    "跳板线路": "🌍"
-  }, airportGroupIcons = {
+    "跳板线路": "🌍",
+  "关闭": "✖️"
+}, airportGroupIcons = {
     "前置中转": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Stack.png",
     "跳板线路": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Drill.png"
   };
-  for (const preservedName of [ "前置中转", "跳板线路" ]) {
+  for (const preservedName of [ "前置中转", "跳板线路", "关闭" ]) {
     const preservedGroup = existingGroupMap[preservedName];
     if (preservedGroup) {
       const renamedGroup = Object.assign({}, preservedGroup);
+      if (preservedName === "关闭" && (!Array.isArray(renamedGroup.proxies) || !renamedGroup.proxies.length)) renamedGroup.proxies = [ "DIRECT" ];
       // 加 emoji 前缀到组名
             airportGroupEmojis[preservedName] && (renamedGroup.name = airportGroupEmojis[preservedName] + " " + preservedName), 
       // 加图标
@@ -1914,14 +1917,6 @@ function buildConfig(config) {
         for (const [origName, emoji] of Object.entries(airportGroupEmojis)) if (name === origName) return emoji + " " + origName;
         return name;
       })),
-      // 过滤悬空引用：机场改版后组成员可能引用未保留的开关组（如「关闭」），
-      // 内核会报 'not found'。只保留真实节点（airportTransitNodeNames 或 allProxyNames）
-      // 与两个机场组的新名引用；全部被过滤为空时兜底 DIRECT。
-      Array.isArray(renamedGroup.proxies) && (renamedGroup.proxies = renamedGroup.proxies.filter(name => {
-        if (name === "DIRECT" || name === "REJECT") return true;
-        for (const [origName, emoji] of Object.entries(airportGroupEmojis)) if (name === emoji + " " + origName) return true;
-        return (airportTransitNodeNames.has(name) && seenProxyNames.has(name)) || allProxyNames.indexOf(name) >= 0;
-      }), renamedGroup.proxies.length || (renamedGroup.proxies = [ "DIRECT" ])),
       proxyGroups.push(renamedGroup);
     }
   }

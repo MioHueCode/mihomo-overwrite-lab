@@ -574,8 +574,17 @@ function main(config) {
     }
     if (!extra.length && byRegion[g.name]) extra = [...byRegion[g.name]];
     const newProxies = extra.length ? [...proxies, ...extra] : proxies.slice();
-    const isRegion = g.name !== "Proxies" && g.name !== "Final" && g.name !== "Steam" && !!(gAbbr || byRegion[g.name] || extra.length);
+    const isRegion = g.name !== "Proxies" && g.name !== "Final" && g.name !== "Steam" && g.name !== "PayPal" && g.name !== "Spotify" && !!(gAbbr || byRegion[g.name] || extra.length);
     const out = Object.assign({}, g, { proxies: newProxies });
+    // PayPal/Spotify：DIRECT 挪到末尾（不排第一），引用链在前
+    if ((g.name === "PayPal" || g.name === "Spotify") && !isRegion) {
+      const psBuiltins = proxies.filter(p => p === "DIRECT" || p === "REJECT" || p === "PASS" || p === "COMPATIBLE");
+      out.proxies = ["Proxies", "智能选择", "最低延迟",
+        ...regionWords.map(w => REGION_ABBR[w] && REGION_ABBR[w].abbr).filter(Boolean),
+        ...["高级.线路", "基础.线路"].filter(t => byTier[t.replace(".线路","")] && byTier[t.replace(".线路","")].length),
+        ...entryNames.map(e => entryDisp(e)), ...psBuiltins];
+      out.__done = true;
+    }
     // Final/Steam：策略组不含真实节点，Proxies 第一 + 统一链（有 DIRECT 则挪末尾）
     if ((g.name === "Final" || g.name === "Steam") && !isRegion) {
       const fsBuiltins = proxies.filter(p => p === "DIRECT" || p === "REJECT" || p === "PASS" || p === "COMPATIBLE");
@@ -727,7 +736,7 @@ function main(config) {
   injected.push("PROCESS-NAME,jp.nicovideo.android,Niconico");
   // Telegram 官方 + 第三方（AyuGram/exteraGram/Turrit/Group）
   injected.push("PROCESS-NAME,org.telegram.messenger,Proxies");
-  injected.push("PROCESS-NAME,com.radolyn.ayugram,Proxies");
+  injected.push("PROCESS-NAME,com.radolyn.ayugram,Telegram");
   injected.push("PROCESS-NAME,com.exteragram.messenger,Proxies");
   injected.push("PROCESS-NAME,org.telegram.group,Proxies");
   injected.push("PROCESS-NAME,turrit,Proxies");

@@ -721,8 +721,8 @@ function main(config) {
   var injected = [];
   // 1. 进程规则（最前）：YouTube/Telegram 第三方客户端走代理
   // YouTube 官方 + Morphe（第三方 YouTube）
-  injected.push("PROCESS-NAME,com.google.android.youtube,Proxies");
-  injected.push("PROCESS-NAME,app.morphe.android.youtube,Proxies");
+  injected.push("PROCESS-NAME,com.google.android.youtube,YouTube");
+  injected.push("PROCESS-NAME,app.morphe.android.youtube,YouTube");
   // TikTok 官方 + 第三方插件
   injected.push("PROCESS-NAME,com.rezvorck.tiktokplugin,TikTok");
   injected.push("PROCESS-NAME,com.zhiliaoapp.musically,TikTok");
@@ -735,11 +735,11 @@ function main(config) {
   // Niconico 安卓客户端
   injected.push("PROCESS-NAME,jp.nicovideo.android,Niconico");
   // Telegram 官方 + 第三方（AyuGram/exteraGram/Turrit/Group）
-  injected.push("PROCESS-NAME,org.telegram.messenger,Proxies");
+  injected.push("PROCESS-NAME,org.telegram.messenger,Telegram");
   injected.push("PROCESS-NAME,com.radolyn.ayugram,Telegram");
-  injected.push("PROCESS-NAME,com.exteragram.messenger,Proxies");
-  injected.push("PROCESS-NAME,org.telegram.group,Proxies");
-  injected.push("PROCESS-NAME,turrit,Proxies");
+  injected.push("PROCESS-NAME,com.exteragram.messenger,Telegram");
+  injected.push("PROCESS-NAME,org.telegram.group,Telegram");
+  injected.push("PROCESS-NAME,turrit,Telegram");
   // 2. Telegram IP 段外部规则集（GEOIP telegram 经典网段 + RS 规则）
   injected.push("RULE-SET,telegramip,Proxies");
   injected.push("GEOIP,TELEGRAM,Proxies,no-resolve");

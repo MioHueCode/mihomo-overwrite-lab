@@ -682,12 +682,20 @@ function main(config) {
     pushG({ name: "Niconico", type: "select", proxies: stdChain(),
       icon: "https://api.iconify.design/simple-icons/niconico.svg?color=%23fa9e00" });
   }
+  if (!newGroups.some(g => g.name === "Meta")) {
+    pushG({ name: "Meta", type: "select", proxies: stdChain(),
+      icon: "https://api.iconify.design/simple-icons/meta.svg?color=%230866ff" });
+  }
+  if (!newGroups.some(g => g.name === "X")) {
+    pushG({ name: "X", type: "select", proxies: stdChain(),
+      icon: "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/X.png" });
+  }
   // 3e) 组顺序：智能选择/最低延迟 在最前，地区组连排，入口组殿后
   const ordered = [];
   const take = n => { const i = newGroups.findIndex(g => g.name === n); if (i >= 0) return newGroups.splice(i, 1)[0]; return null; };
   // Proxies 永远第一，随后智能选择/最低延迟；YouTube → TikTok → Niconico 固定顺序
   for (const n of ["Proxies", "智能选择", "最低延迟"]) { const g = take(n); if (g) ordered.push(g); }
-  for (const n of ["YouTube", "TikTok", "Niconico"]) { const g = take(n); if (g) ordered.push(g); }
+  for (const n of ["YouTube", "TikTok", "Niconico", "Meta", "X"]) { const g = take(n); if (g) ordered.push(g); }
   const regionAbbrs = regionWords.map(w => REGION_ABBR[w] && REGION_ABBR[w].abbr).filter(Boolean);
   const regionTop = [];
   for (const ab of regionAbbrs) { const g = take(ab); if (g) regionTop.push(g); }
@@ -731,9 +739,30 @@ function main(config) {
   injected.push("DOMAIN-SUFFIX,nicovideo.jp,Niconico");
   injected.push("DOMAIN-SUFFIX,nimg.jp,Niconico");
   injected.push("DOMAIN-SUFFIX,dmc.nico,Niconico");
+  // Meta 系（Facebook/Instagram/WhatsApp/Threads）
+  injected.push("GEOSITE,meta,Meta");
+  injected.push("GEOSITE,facebook,Meta");
+  injected.push("GEOSITE,instagram,Meta");
+  injected.push("GEOSITE,whatsapp,Meta");
+  injected.push("DOMAIN-SUFFIX,fbcdn.net,Meta");
+  injected.push("DOMAIN-SUFFIX,cdninstagram.com,Meta");
+  // X (Twitter)
+  injected.push("GEOSITE,twitter,X");
+  injected.push("DOMAIN-SUFFIX,x.com,X");
+  injected.push("DOMAIN-SUFFIX,twimg.com,X");
   injected.push("PROCESS-NAME,com.ss.android.ugc.trill,TikTok");
   // Niconico 安卓客户端
   injected.push("PROCESS-NAME,jp.nicovideo.android,Niconico");
+  // Meta 系客户端（Facebook/Instagram/WhatsApp/Threads）
+  injected.push("PROCESS-NAME,com.facebook.katana,Meta");
+  injected.push("PROCESS-NAME,com.instagram.android,Meta");
+  injected.push("PROCESS-NAME,com.whatsapp,Meta");
+  injected.push("PROCESS-NAME,com.whatsapp.w4b,Meta");
+  injected.push("PROCESS-NAME,com.facebook.orca,Meta");
+  injected.push("PROCESS-NAME,barudev.Threadsv1,Meta");
+  // X (Twitter) 官方 + 第三方
+  injected.push("PROCESS-NAME,com.twitter.android,X");
+  injected.push("PROCESS-NAME,com.twitter.android.lite,X");
   // Telegram 官方 + 第三方（AyuGram/exteraGram/Turrit/Group）
   injected.push("PROCESS-NAME,org.telegram.messenger,Telegram");
   injected.push("PROCESS-NAME,com.radolyn.ayugram,Telegram");

@@ -759,6 +759,7 @@ function main(config) {
   injected.push("PROCESS-NAME,com.whatsapp,Meta");
   injected.push("PROCESS-NAME,com.whatsapp.w4b,Meta");
   injected.push("PROCESS-NAME,com.facebook.orca,Meta");
+  injected.push("PROCESS-NAME,com.instagram.barcelona,Meta");
   injected.push("PROCESS-NAME,barudev.Threadsv1,Meta");
   // X (Twitter) 官方 + 第三方
   injected.push("PROCESS-NAME,com.twitter.android,X");

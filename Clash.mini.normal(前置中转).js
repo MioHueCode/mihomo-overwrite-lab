@@ -2661,5 +2661,61 @@ function validateOutputConfig(config) {
 
 function main(config) {
   const workingConfig = normalizeInputConfig(clonePlainConfig(config && "object" == typeof config ? config : {}));
-  return validateOutputConfig(normalizeInputConfig(buildConfig(workingConfig)));
+  var __output = validateOutputConfig(normalizeInputConfig(buildConfig(workingConfig)));
+  // ── 配置收敛优化（无行为变化）──
+  try {
+    var dns = __output.dns || {};
+    // ① nameserver-policy 同根域收敛：同值且同根域(≥3条)的精确域名合并为 +.根域
+    var pol = dns["nameserver-policy"];
+    if (pol && typeof pol === "object") {
+      var byVal = {}, keys = Object.keys(pol), i, j, k;
+      for (i = 0; i < keys.length; i++) {
+        var v = JSON.stringify(pol[keys[i]]);
+        (byVal[v] = byVal[v] || []).push(keys[i]);
+      }
+      var np = {};
+      for (var val in byVal) {
+        var domains = byVal[val], roots = {};
+        for (j = 0; j < domains.length; j++) {
+          var d = domains[j].replace(/^\+\./, "");
+          var parts = d.split(".");
+          if (parts.length >= 2) {
+            var root = parts.slice(-2).join(".");
+            (roots[root] = roots[root] || []).push(d);
+          } else np[domains[j]] = pol[domains[j]];
+        }
+        for (var root in roots) {
+          var ds = roots[root];
+          if (ds.length >= 3) np["+." + root] = pol[ds[0]];
+          else for (k = 0; k < ds.length; k++) np[ds[k]] = pol[ds[k]];
+        }
+      }
+      dns["nameserver-policy"] = np;
+    }
+    // ② fake-ip-filter：无通配符的精确域名收敛为 +.根域
+    var fif = dns["fake-ip-filter"];
+    if (Array.isArray(fif)) {
+      var exact = [], wild = [];
+      for (i = 0; i < fif.length; i++) {
+        var x = fif[i];
+        if (typeof x === "string" && x.indexOf("+.") !== 0 && x.indexOf("*") < 0) exact.push(x);
+        else wild.push(x);
+      }
+      var roots2 = {}, out2 = [];
+      for (var e = 0; e < exact.length; e++) {
+        var parts2 = exact[e].replace(/^\+\./, "").split(".");
+        var root2 = parts2.length >= 2 ? parts2.slice(-2).join(".") : exact[e];
+        (roots2[root2] = roots2[root2] || []).push(exact[e]);
+      }
+      for (var r2 in roots2) {
+        var ds2 = roots2[r2];
+        if (ds2.length >= 2) out2.push("+." + r2);
+        else out2.push(ds2[0]);
+      }
+      dns["fake-ip-filter"] = wild.concat(out2);
+    }
+    // ③ 输出统计日志
+    console.log("[Clash.mini] 节点 " + ((__output.proxies || []).length) + " · 组 " + ((__output["proxy-groups"] || []).length) + " · 规则 " + ((__output.rules || []).length) + " · DNS policy " + Object.keys(dns["nameserver-policy"] || {}).length + " 条");
+  } catch (e) { console.log("[Clash.mini] 收敛优化跳过: " + e.message); }
+  return __output;
 }

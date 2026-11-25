@@ -1345,7 +1345,7 @@ function buildConfig(config) {
   // AI 候选池：优先放入对海外 AI 服务兼容性通常更稳定的地区节点组。
   regionGroups["新加坡"], regionGroups["日本"], regionGroups["美国"]), cloudflareGroupChoices = sanitizeUiChoiceList(
   // 下载分区定义
-  [ "自动选择", "欧美故障转移", "全球手动" ], buildNodeChain([ /cloudflare/i, /\bCF\b/i, /WARP/i, /1\.1\.1\.1/ ]), regionManualNames.filter(name => !String(name).includes("家宽"))), DOWNLOAD_REGION_DEFS = [ {
+  ["节点选择",  "自动选择", "欧美故障转移", "全球手动" ], buildNodeChain([ /cloudflare/i, /\bCF\b/i, /WARP/i, /1\.1\.1\.1/ ]), regionManualNames.filter(name => !String(name).includes("家宽"))), DOWNLOAD_REGION_DEFS = [ {
     key: "香港",
     groupName: "香港下载",
     icon: regionIconMap["香港"] || qIcon("HK")
@@ -1691,11 +1691,11 @@ function buildConfig(config) {
     poolKey: "common"
   }, {
     key: "个人媒体",
-    first: [ globalStreamingGroup ? "全球流媒体" : null, "港台故障转移", "节点选择", "自动选择" ].filter(Boolean),
+    first: ["节点选择", globalStreamingGroup ? "全球流媒体" : null, "港台故障转移", "自动选择"].filter(Boolean),
     poolKey: "streaming"
   }, {
     key: "新闻资讯",
-    first: [ "欧美故障转移", "节点选择", "自动选择" ],
+    first: ["节点选择", "欧美故障转移", "自动选择"],
     poolKey: "common"
   } ], BUSINESS_SERVICE_HEAD = [ [ "YouTube", iconMap.youtube ], [ "TikTok", iconMap.tiktok ], [ "Meta", iconMap.meta ], [ "Twitter", iconMap.twitter ], [ "Niconico", iconMap.niconico ], [ "日韩生态区", iconMap.jpkr ], [ "Spotify", iconMap.spotify ], [ "Telegram", iconMap.telegram ], [ "Google", iconMap.google ], [ "谷歌商店", iconMap.playstore ], [ "微软服务", iconMap.microsoft ], [ "微软Bing", iconMap.bing ] ], BUSINESS_SERVICE_TAIL = [ [ "翻译服务", iconMap.translate ], [ "支付服务", iconMap.payment ], [ "Twitch", iconMap.twitch ], [ "GitHub", iconMap.github ], [ "国外游戏", iconMap.game ], [ "社交信息流", iconMap.social ], [ "去中心化平台", iconMap.decentralized ], [ "Discord", iconMap.discord ], [ "个人媒体", iconMap.personalMedia ], [ "新闻资讯", iconMap.news ] ], BUSINESS_SERVICE_ICON_DEFS = BUSINESS_SERVICE_HEAD.concat(BUSINESS_SERVICE_TAIL), businessChoiceMap = function(defs, templateMap = null) {
     return function(defs, keyField, builder) {

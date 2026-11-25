@@ -1642,7 +1642,7 @@ function buildConfig(config) {
     poolKey: "youtubeOnly"
   }, {
     key: "Spotify",
-    first: [ "港台故障转移" ],
+    first: ["节点选择",  "港台故障转移" ],
     poolKey: "common"
   }, {
     key: "Google",

@@ -787,7 +787,7 @@ function buildConfig(config) {
     proxy.ports && void 0 === proxy["hop-interval"] && (proxy["hop-interval"] = 30)), 
     // TLS 1.3 强制：对所有 TLS 节点统一声明 tls13-ciphers，排除 TLS 1.2 旧套件，防止降级攻击与协议歧义。
     "vless" === proxy.type && (void 0 === proxy.tfo && (proxy.tfo = !1), void 0 === proxy["client-fingerprint"] && (proxy["client-fingerprint"] = "chrome")), 
-    "vless" !== proxy.type && "trojan" !== proxy.type && "shadowsocks" !== proxy.type || "object" == typeof proxy.tls && null !== proxy.tls && !proxy.tls["tls13-ciphers"] && (proxy.tls["tls13-ciphers"] = "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256"), 
+    "vless" !== proxy.type && "trojan" !== proxy.type && "shadowsocks" !== proxy.type || proxy.tls && !proxy.tls["tls13-ciphers"] && (proxy.tls["tls13-ciphers"] = "TLS_AES_256_GCM_SHA384:TLS_AES_128_GCM_SHA256"), 
     cleanProxies.push(proxy), 
     // 机场专用前置中转节点（如 🇨🇳 南京移动）：
     // 保留在 proxies 列表（内核需要识别），但不加入 allProxyNames（不进普通节点组）。
@@ -1668,11 +1668,11 @@ function buildConfig(config) {
     poolKey: "common"
   }, {
     key: "TikTok",
-    first: [ "港台智能选择", "🔗链式出口" ],
+    first: ["节点选择",  "港台智能选择", "🔗链式出口" ],
     poolKey: "common"
   }, ...[ "日韩生态区", "Niconico" ].map(key => ({
     key: key,
-    first: [ "日韩智能选择" ],
+    first: ["节点选择",  "日韩智能选择" ],
     poolKey: "common"
   })), {
     key: "去中心化平台",
@@ -1897,19 +1897,16 @@ function buildConfig(config) {
   // 注入时加 emoji 前缀和图标，让机场组在 UI 中更醒目。
   // 同时更新组内 proxies 引用的组名（机场原始名称 → 新 emoji 名称），避免内核报 not found。
     const airportGroupEmojis = {
-
     "前置中转": "⚙️",
-    "跳板线路": "🌍",
-  "关闭": "✖️"
-}, airportGroupIcons = {
+    "跳板线路": "🌍"
+  }, airportGroupIcons = {
     "前置中转": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Stack.png",
     "跳板线路": "https://fastly.jsdelivr.net/gh/Koolson/Qure@master/IconSet/Color/Drill.png"
   };
-  for (const preservedName of [ "前置中转", "跳板线路", "关闭" ]) {
+  for (const preservedName of [ "前置中转", "跳板线路" ]) {
     const preservedGroup = existingGroupMap[preservedName];
     if (preservedGroup) {
       const renamedGroup = Object.assign({}, preservedGroup);
-      if (preservedName === "关闭" && (!Array.isArray(renamedGroup.proxies) || !renamedGroup.proxies.length)) renamedGroup.proxies = [ "DIRECT" ];
       // 加 emoji 前缀到组名
             airportGroupEmojis[preservedName] && (renamedGroup.name = airportGroupEmojis[preservedName] + " " + preservedName), 
       // 加图标
@@ -1918,8 +1915,7 @@ function buildConfig(config) {
       Array.isArray(renamedGroup.proxies) && (renamedGroup.proxies = renamedGroup.proxies.map(name => {
         for (const [origName, emoji] of Object.entries(airportGroupEmojis)) if (name === origName) return emoji + " " + origName;
         return name;
-      })),
-      proxyGroups.push(renamedGroup);
+      })), proxyGroups.push(renamedGroup);
     }
   }
   const finalizedProxyGroups = function(groups) {

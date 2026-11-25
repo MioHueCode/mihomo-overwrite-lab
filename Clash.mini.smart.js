@@ -1636,11 +1636,11 @@ function buildConfig(config) {
     poolKey: "common"
   }, {
     key: "TikTok",
-    first: [ "港台智能选择", "🔗链式出口" ],
+    first: ["节点选择",  "港台智能选择", "🔗链式出口" ],
     poolKey: "common"
   }, ...[ "日韩生态区", "Niconico" ].map(key => ({
     key: key,
-    first: [ "日韩智能选择" ],
+    first: ["节点选择",  "日韩智能选择" ],
     poolKey: "common"
   })), {
     key: "去中心化平台",

@@ -1628,7 +1628,7 @@ function buildConfig(config) {
     poolKey: "youtubeOnly"
   }, {
     key: "Spotify",
-    first: [ "港台智能选择" ],
+    first: ["节点选择",  "港台智能选择" ],
     poolKey: "common"
   }, {
     key: "Google",
